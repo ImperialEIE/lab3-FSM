@@ -39,9 +39,6 @@ int main(int argc, char **argv, char **env) {
             }
         }
 
-        
-
-
         vbdBar(top->dout & 0xFF);
         // vbdHex(1, top->dout & 0xFF);
         vbdCycle(simcyc);
