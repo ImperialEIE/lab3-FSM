@@ -29,9 +29,9 @@ int main(int argc, char **argv, char **env) {
   top->rst = 0;
   // top->trigger = 1;
 
-  bool readyToTime;
-  bool timingMode;
-  bool flag;
+  bool readyToTime = false;
+  bool timingMode = false;
+  bool flag = false;
   
   // run simulation for MAX_SIM_CYC clock cycles
   for (simcyc=0; simcyc<MAX_SIM_CYC; simcyc++) {
@@ -46,25 +46,23 @@ int main(int argc, char **argv, char **env) {
 
     vbdBar(top->dout & 0xFF);
 
-    // if (top->dout == 2^8 - 1) readyToTime = true;
-    // if (readyToTime && top->dout == 0) {
-    //   vbdInitWatch();
-    //   timingMode = true;
-    //   readyToTime = false;
-    // }
+    if (top->dout == 0b11111111) readyToTime = true;
+    if (readyToTime && top->dout == 0) {
+      timingMode = true;
+      readyToTime = false;
+      vbdInitWatch();
+    }
     
     // set up input signals of testbench
     flag = vbdFlag();
     if (timingMode && flag) {
       int result = vbdElapsed();
-      std::string msec = std::to_string(result);
-      msec.insert(msec.begin(), 5 - msec.size(), '0');
 
-      vbdHex(1, (int)(msec[msec.size() - 1] - '0') & 0xFF); // print just digits
-      vbdHex(2, (int)(msec[msec.size() - 2] - '0') & 0xFF);
-      vbdHex(3, (int)(msec[msec.size() - 3] - '0') & 0xFF);
-      vbdHex(4, (int)(msec[msec.size() - 4] - '0') & 0xFF);
-      vbdHex(5, (int)(msec[msec.size() - 5] - '0') & 0xFF);
+      vbdHex(1, (int)(result % 10) & 0xFF); // print just digits
+      vbdHex(2, (int)(result / 10 % 10) & 0xFF);
+      vbdHex(3, (int)(result / 100 % 10) & 0xFF);
+      vbdHex(4, (int)(result / 1000 % 10) & 0xFF);
+      vbdHex(5, (int)(result / 10000 % 10) & 0xFF);
       
       timingMode = false;
     }
