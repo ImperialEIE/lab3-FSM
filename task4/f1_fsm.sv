@@ -18,7 +18,7 @@ module f1_fsm #(
         else     current_state <= next_state;
     
     always_comb begin
-        if (trigger) cmd_seq = 1;
+        if (trigger && !cmd_delay) cmd_seq = 1;
         if (en) begin
             case (current_state)
                 S_0: next_state = S_1;
